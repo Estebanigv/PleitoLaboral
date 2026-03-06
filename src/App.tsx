@@ -25,6 +25,21 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+/* ── Componente reutilizable de título de sección ── */
+const SectionLabel = ({ text, dark = false }: { text: string; dark?: boolean }) => (
+  <div className="flex items-center gap-3 mb-4">
+    <div className={`h-px w-8 ${dark ? 'bg-[#D4AF37]' : 'bg-[#3b82f6]'}`} />
+    <span className={`text-[10px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full border ${
+      dark
+        ? 'text-[#D4AF37] border-[#D4AF37]/30 bg-[#D4AF37]/10'
+        : 'text-[#3b82f6] border-[#3b82f6]/20 bg-[#3b82f6]/5'
+    }`}>
+      {text}
+    </span>
+    <div className={`h-px w-4 ${dark ? 'bg-[#D4AF37]/40' : 'bg-[#3b82f6]/20'}`} />
+  </div>
+);
+
 /* ─────────────────────────────────────────────────────────── NAVBAR ── */
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -44,6 +59,14 @@ const Navbar = () => {
     { label: 'Contacto', href: '#contacto' },
   ];
 
+  const handleNavClick = (href: string) => {
+    setMobileOpen(false);
+    setTimeout(() => {
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 320);
+  };
+
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 py-3 shadow-sm' : 'bg-transparent py-4 md:py-6'}`}>
@@ -53,13 +76,13 @@ const Navbar = () => {
             <img
               src={scrolled ? '/logo/isotipo pleito laboral - azul.svg' : '/logo/isotipo pleito laboral - blanco.svg'}
               alt="Isotipo Pleito Laboral"
-              className="h-9 sm:h-11 w-auto object-contain"
+              className="h-8 sm:h-11 w-auto object-contain"
             />
             <div className="flex flex-col">
-              <h2 className={`text-base sm:text-xl font-black leading-none tracking-tighter uppercase ${scrolled ? 'text-slate-900' : 'text-white'}`}>
+              <h2 className={`text-sm sm:text-xl font-black leading-none tracking-tighter uppercase ${scrolled ? 'text-slate-900' : 'text-white'}`}>
                 Pleito Laboral
               </h2>
-              <span className={`flex justify-between text-[11px] sm:text-[13px] font-black uppercase ${scrolled ? 'text-[#3b82f6]' : 'text-[#D4AF37]'}`}>
+              <span className={`flex justify-between text-[10px] sm:text-[13px] font-black uppercase ${scrolled ? 'text-[#3b82f6]' : 'text-[#D4AF37]'}`}>
                 {'ABOGADOS'.split('').map((l, i) => <span key={i}>{l}</span>)}
               </span>
             </div>
@@ -89,7 +112,7 @@ const Navbar = () => {
             <div className="hidden md:block w-px h-5 bg-white/20" />
             <a
               href="#contacto"
-              className="bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-full px-4 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95"
+              className="hidden sm:block bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded-full px-4 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-[11px] font-black uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95"
             >
               Consulta Express
             </a>
@@ -114,44 +137,79 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-black/60 z-[60] lg:hidden"
+              className="fixed inset-0 bg-black/70 z-[200] lg:hidden"
             />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-72 bg-slate-950 z-[70] lg:hidden flex flex-col p-8"
+              transition={{ type: 'tween', duration: 0.28 }}
+              className="fixed top-0 right-0 h-full w-[300px] z-[210] lg:hidden flex flex-col overflow-hidden"
+              style={{ background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 100%)' }}
             >
-              <div className="flex justify-between items-center mb-10">
-                <span className="text-white font-black uppercase tracking-widest text-sm">Menú</span>
-                <button onClick={() => setMobileOpen(false)} className="text-white/60 hover:text-white">
-                  <X size={22} />
+              {/* Decoración fondo */}
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#3b82f6]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#D4AF37]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+              {/* Header */}
+              <div className="relative flex justify-between items-center px-6 pt-6 pb-5">
+                <div className="flex items-center gap-3">
+                  <img src="/logo/isotipo pleito laboral - blanco.svg" alt="Logo" className="h-8 w-auto" />
+                  <div>
+                    <p className="text-white font-black uppercase tracking-tighter text-sm leading-none">Pleito Laboral</p>
+                    <p className="text-[#D4AF37] text-[9px] font-bold uppercase tracking-[0.2em]">Abogados</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-9 h-9 rounded-full border border-white/10 bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all"
+                >
+                  <X size={16} />
                 </button>
               </div>
-              <nav className="flex flex-col gap-6">
-                {links.map((item) => (
-                  <a
+
+              {/* Línea decorativa dorada */}
+              <div className="mx-6 h-px bg-gradient-to-r from-[#D4AF37]/60 via-[#D4AF37]/20 to-transparent mb-6" />
+
+              {/* Nav links */}
+              <nav className="relative flex flex-col px-4 gap-1 flex-1">
+                {links.map((item, idx) => (
+                  <motion.a
                     key={item.label}
                     href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="text-white/70 hover:text-white font-bold uppercase tracking-widest text-sm flex items-center gap-3 transition-colors"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.06 }}
+                    onClick={(e) => { e.preventDefault(); handleNavClick(item.href); }}
+                    className="group flex items-center justify-between px-4 py-4 rounded-2xl text-white/50 hover:text-white hover:bg-white/8 transition-all"
                   >
-                    <ChevronRight size={14} className="text-[#3b82f6]" />
-                    {item.label}
-                  </a>
+                    <div className="flex items-center gap-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
+                      <span className="font-black uppercase tracking-widest text-xs">{item.label}</span>
+                    </div>
+                    <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-[#3b82f6]" />
+                  </motion.a>
                 ))}
               </nav>
-              <div className="mt-auto flex flex-col gap-3">
-                <a href="tel:+56994712414" className="flex items-center gap-2 text-white/50 text-sm">
-                  <Phone size={14} className="text-[#D4AF37]" /> +56 9 9471 2414
+
+              {/* Footer */}
+              <div className="relative px-6 py-6">
+                <div className="mb-4 h-px bg-white/8" />
+                <a
+                  href="tel:+56994712414"
+                  className="flex items-center gap-2 text-white/30 hover:text-white/70 text-xs mb-4 transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-full bg-[#D4AF37]/10 flex items-center justify-center">
+                    <Phone size={12} className="text-[#D4AF37]" />
+                  </div>
+                  +56 9 9471 2414
                 </a>
                 <a
                   href="#contacto"
-                  onClick={() => setMobileOpen(false)}
-                  className="bg-[#3b82f6] text-white text-center rounded-full py-3 font-black uppercase tracking-widest text-xs"
+                  onClick={(e) => { e.preventDefault(); handleNavClick('#contacto'); }}
+                  className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white text-center rounded-2xl py-4 font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
                 >
-                  Solicitar Consulta
+                  Solicitar Consulta <ChevronRight size={13} />
                 </a>
               </div>
             </motion.div>
@@ -176,49 +234,51 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/40 to-slate-950" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 w-full pt-28 pb-20 md:pt-32 md:pb-24">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-6 md:px-10 w-full pt-24 pb-16 sm:pt-28 sm:pb-20 md:pt-36 md:pb-28 flex items-center min-h-screen">
         <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="max-w-4xl"
+          className="w-full max-w-4xl"
         >
-          <div className="flex items-center gap-3 mb-5 md:mb-6">
-            <div className="h-[1px] w-8 sm:w-12 bg-[#D4AF37]" />
-            <span className="text-[#D4AF37] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2 mb-6 md:mb-8">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+            <span className="text-[#D4AF37] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">
               Excelencia Jurídica en Chile
             </span>
           </div>
 
-          <h1 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-6 md:mb-8 tracking-tighter">
-            Resultados Sólidos <br />
-            para <span className="text-[#D4AF37]">Trabajadores</span> <br />
-            <span className="text-[#D4AF37]">y Empresas</span>
+          {/* Título */}
+          <h1 className="font-serif text-white text-[2.4rem] sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-5 md:mb-8 tracking-tighter">
+            Resultados Sólidos
+            <span className="block">para <span className="text-[#D4AF37]">Trabajadores</span></span>
+            <span className="block text-[#D4AF37]">y Empresas</span>
           </h1>
 
-          <p className="text-slate-300 text-base md:text-xl font-light leading-relaxed max-w-2xl mb-8 md:mb-10 border-l border-white/20 pl-5 sm:pl-8">
-            Estrategia legal de alto impacto para trabajadores y empresas.
+          {/* Subtítulo */}
+          <p className="text-slate-300 text-sm sm:text-base md:text-xl font-light leading-relaxed max-w-xl mb-8 md:mb-10">
+            Defensa jurídica de alto impacto con honorarios contra resultados.
             Ubicados en Vitacura, Santiago.
           </p>
 
-          <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-5">
+          {/* Botones */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
             <a
               href="#contacto"
-              className="group bg-white text-slate-950 rounded-full px-7 sm:px-10 py-4 sm:py-5 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 transition-all hover:bg-[#D4AF37] hover:text-white"
+              className="group bg-white text-slate-950 rounded-full px-7 py-4 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 transition-all hover:bg-[#D4AF37] hover:text-white"
             >
               Solicitar Consulta Gratuita
-              <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ChevronRight size={15} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
               href="https://wa.me/56994712414?text=Hola%2C%20me%20gustar%C3%ADa%20una%20consulta%20laboral%20gratuita."
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-transparent border border-white/20 text-white hover:bg-white/5 rounded-full px-7 sm:px-10 py-4 sm:py-5 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3"
+              className="bg-transparent border border-white/30 text-white hover:bg-white/10 rounded-full px-7 py-4 font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-3"
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 shrink-0">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              Escríbenos por WhatsApp
+              <MessageCircle size={15} className="shrink-0" />
+              Habla con un Abogado
             </a>
           </div>
         </motion.div>
@@ -469,6 +529,7 @@ const ServicesGrid = () => {
       {selected && <ServiceModal service={selected} onClose={() => setSelected(null)} />}
 
       <section className="py-20 md:py-32 bg-slate-50 overflow-hidden" id="trabajadores">
+        <div id="empresas" className="absolute -top-24" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
           {/* Tab toggle */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-6">
@@ -499,9 +560,7 @@ const ServicesGrid = () => {
               transition={{ duration: 0.3 }}
               className="mb-12 md:mb-16"
             >
-              <span className="text-[#3b82f6] font-black uppercase tracking-[0.3em] text-[10px] mb-3 block">
-                {activeTab === 'workers' ? 'Servicios para el Trabajador' : 'Servicios para la Empresa'}
-              </span>
+              <SectionLabel text={activeTab === 'workers' ? 'Servicios para el Trabajador' : 'Servicios para la Empresa'} />
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight mb-2">
                 {activeTab === 'workers' ? workerTitle : companyTitle}
               </h2>
@@ -568,7 +627,7 @@ const OfficeShowcase = () => {
 
           {/* Texto */}
           <div className="flex flex-col gap-6 md:gap-8">
-            <span className="text-[#D4AF37] font-black uppercase tracking-[0.3em] text-[10px]">Infraestructura</span>
+            <SectionLabel text="Infraestructura" />
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-none">
               Entorno Profesional <br /> para su <span className="text-[#3b82f6]">Tranquilidad</span>
             </h2>
@@ -618,42 +677,73 @@ const Team = () => {
     <section className="py-20 md:py-32 bg-slate-950 text-white overflow-hidden" id="equipo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
         <div className="flex flex-col items-center text-center mb-14 md:mb-24">
-          <span className="text-[#D4AF37] font-black uppercase tracking-[0.3em] text-[10px] mb-6">Liderazgo</span>
-          <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter mb-8">
+          <SectionLabel text="Nuestro Equipo" dark />
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter mb-8 mt-2">
             Nuestro <span className="text-white/30">Equipo</span>
           </h2>
           <div className="h-1 w-20 bg-[#3b82f6] rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
           {members.map((member, idx) => (
             <motion.div
               key={idx}
               whileHover={{ y: -6 }}
-              className="group relative bg-white/5 border border-white/10 rounded-3xl md:rounded-[40px] overflow-hidden flex flex-col sm:flex-row items-stretch transition-all duration-500 hover:bg-white/10"
+              className="group relative bg-white/5 border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/10"
             >
-              {/* Foto */}
-              <div className="w-full sm:w-2/5 overflow-hidden">
+              {/* ── MOBILE: foto full-width con overlay ── */}
+              <div className="relative sm:hidden h-72 overflow-hidden">
                 <img
                   src={member.image}
                   alt={member.name}
-                  className="w-full h-72 sm:h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700 min-h-[280px]"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                  style={{ objectPosition: 'center 20%' }}
                 />
-              </div>
-              {/* Info */}
-              <div className="flex-1 p-6 sm:p-8 md:p-10 flex flex-col justify-center">
-                <div className="mb-4 md:mb-6">
-                  <h3 className="text-xl md:text-2xl font-black mb-1 tracking-tight">{member.name}</h3>
-                  <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest">{member.role}</p>
+                {/* Gradiente overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                {/* Nombre sobre la foto */}
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h3 className="text-xl font-black tracking-tight leading-tight">{member.name}</h3>
+                  <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest mt-1">{member.role}</p>
                 </div>
-                <p className="text-white/60 text-sm leading-relaxed font-light mb-6 md:mb-8">{member.bio}</p>
+              </div>
+
+              {/* ── MOBILE: bio + botones ── */}
+              <div className="px-6 py-5 sm:hidden">
+                <p className="text-white/60 text-sm leading-relaxed font-light mb-5">{member.bio}</p>
                 <div className="flex gap-3">
-                  <a href="#" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
+                  <a href="#" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
                     <Linkedin size={15} />
                   </a>
-                  <a href="mailto:cfernandez@pleitolaboral.cl" className="w-9 h-9 md:w-10 md:h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
+                  <a href="mailto:cfernandez@pleitolaboral.cl" className="w-9 h-9 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
                     <Mail size={15} />
                   </a>
+                </div>
+              </div>
+
+              {/* ── SM+: layout horizontal ── */}
+              <div className="hidden sm:flex items-stretch">
+                <div className="w-2/5 overflow-hidden">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700 min-h-[300px]"
+                  />
+                </div>
+                <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
+                  <div className="mb-5">
+                    <h3 className="text-xl md:text-2xl font-black mb-1 tracking-tight">{member.name}</h3>
+                    <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-widest">{member.role}</p>
+                  </div>
+                  <p className="text-white/60 text-sm leading-relaxed font-light mb-7">{member.bio}</p>
+                  <div className="flex gap-3">
+                    <a href="#" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
+                      <Linkedin size={15} />
+                    </a>
+                    <a href="mailto:cfernandez@pleitolaboral.cl" className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all">
+                      <Mail size={15} />
+                    </a>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -675,7 +765,7 @@ const Contact = () => {
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
             {/* Info */}
             <div>
-              <span className="text-[#3b82f6] font-black uppercase tracking-[0.3em] text-[10px] mb-6 block">Contacto Directo</span>
+              <SectionLabel text="Contacto Directo" />
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-none mb-8 md:mb-10">
                 Inicie su <br /> <span className="text-slate-400">Consulta</span> Legal
               </h2>
